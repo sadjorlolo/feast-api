@@ -3,5 +3,5 @@
 class User < ApplicationRecord
   include Authentication
   has_many :examples
-  has_many :events
+  has_many :created_events, class_name: 'Event', inverse_of: 'event_creator'
 end

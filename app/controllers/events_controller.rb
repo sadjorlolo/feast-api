@@ -4,7 +4,7 @@ class EventsController < ProtectedController
   # GET /events
   def index
     # @events = Event.all
-    @events = current_user.events.all
+    @events = current_user.created_events.all
 
     render json: @events
   end
@@ -17,7 +17,7 @@ class EventsController < ProtectedController
   # POST /events
   def create
     # @event = Event.new(event_params)
-    @event = current_user.events.build(event_params)
+    @event = current_user.created_events.build(event_params)
 
     if @event.save
       render json: @event, status: :created, location: @event
@@ -43,7 +43,7 @@ class EventsController < ProtectedController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_event
-      @event = current_user.events.find(params[:id])
+      @event = current_user.created_events.find(params[:id])
       # @event = Event.find(params[:id])
     end
 
