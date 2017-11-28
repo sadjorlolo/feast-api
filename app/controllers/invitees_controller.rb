@@ -47,20 +47,22 @@ class InviteesController < ProtectedController
     #   @invitee.destroy
     # return @invitee.destroy if current_user.created_events.find(Invitee.find(params[:id]).event_id)
     # return @invitee.destroy if current_user.invitees.find(params[:id])
-    if current_user.created_events.find(Invitee.find(params[:id]).event_id)
+    # if current_user.created_events.find(Invitee.find(params[:id]).event_id) || @invitee.destroy
+    # elsif current_user.invitees.
+    #
+    # end
+    # if current_user.invitees.find(params[:id])
       @invitee.destroy
-    # elsif current_user.invitees.find(params[:id])
-    #   @invitee.destroy
-    end
+    # end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_invitee
-      # @invitee = current_user.invitees.find(params[:id])
+      @invitee = current_user.invitees.find(params[:id])
       # only if the current_user is the invitee, can record be deleted
       # if current_user.invitees.find(params[:id])
-      @invitee = Invitee.find(params[:id])
+      # @invitee = Invitee.find(params[:id])
       # end
     end
 
