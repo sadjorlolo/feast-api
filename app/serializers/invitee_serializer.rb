@@ -1,5 +1,5 @@
 class InviteeSerializer < ActiveModel::Serializer
   attributes :id
-  has_one :user
-  has_one :event
+  has_one :event_attendee
+  has_one :attended_event
 end
