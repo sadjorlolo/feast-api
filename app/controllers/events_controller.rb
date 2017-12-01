@@ -16,7 +16,6 @@ class EventsController < ProtectedController
 
   # POST /events
   def create
-    # @event = Event.new(event_params)
     @event = current_user.created_events.build(event_params)
 
     if @event.save
@@ -44,7 +43,6 @@ class EventsController < ProtectedController
     # Use callbacks to share common setup or constraints between actions.
     def set_event
       @event = current_user.created_events.find(params[:id])
-      # @event = Event.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.
