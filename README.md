@@ -1,303 +1,104 @@
-FEAST information
-
-Rails[![General Assembly Logo](https://camo.githubusercontent.com/1a91b05b8f4d44b5bbfb83abac2b0996d8e26c92/687474703a2f2f692e696d6775722e636f6d2f6b6538555354712e706e67)](https://generalassemb.ly/education/web-development-immersive)
-
-# rails-api-template
-
-A template for starting projects with `rails-api`. Includes authentication.
-
-At the beginning of each cohort, update the versions in [`Gemfile`](Gemfile).
-
-## Dependencies
-
-Install with `bundle install`.
-
--   [`rails-api`](https://github.com/rails-api/rails-api)
--   [`rails`](https://github.com/rails/rails)
--   [`active_model_serializers`](https://github.com/rails-api/active_model_serializers)
--   [`ruby`](https://www.ruby-lang.org/en/)
--   [`postgres`](http://www.postgresql.org)
-
-## Installation
-
-1.  [Download](../../archive/master.zip) this template.
-1.  Unzip and rename the template directory.
-1.  Empty [`README.md`](README.md) and fill with your own content.
-1.  Move into the new project and `git init`.
-1.  Install dependencies with `bundle install`.
-1.  Rename your app module in `config/application.rb` (change
-    `RailsApiTemplate`).
-1.  Rename your project database in `config/database.yml` (change
-    `'rails-api-template'`).
-1.  `git add` and `git commit` your changes.
-1.  Create a `.env` for sensitive settings (`touch .env`).
-1.  Generate new `development` and `test` secrets (`bundle exec rake secret`).
-1.  Store them in `.env` with keys `SECRET_KEY_BASE_<DEVELOPMENT|TEST>`
-    respectively.
-1.  In order to make requests to your deployed API, you will need to set
-    `SECRET_KEY_BASE` in the environment of the production API (using `heroku
-    config:set` or the Heroku dashboard).
-1.  In order to make requests from your deployed client application, you will
-    need to set `CLIENT_ORIGIN` in the environment of the production API (e.g.
-    `heroku config:set CLIENT_ORIGIN=Fhttps://<github-username>.github.io`).
-1.  Setup your database with:
-    - bin/rake db:drop (if it already exists)
-    - bin/rake db:create
-    - bin/rake db:migrate
-    - bin/rake db:seed
-    - bin/rake db:examples
-1.  Run the API server with `bin/rails server` or `bundle exec rails server`.
-
-## Structure
-
-This template follows the standard project structure in Rails.
-
-`curl` command scripts are stored in [`scripts`](scripts) with names that
-correspond to API actions.
-
-User authentication is built-in.
-
-## Tasks
-
-Developers should run these often!
-
--   `bin/rake routes` lists the endpoints available in your API.
--   `bin/rake test` runs automated tests.
--   `bin/rails console` opens a REPL that pre-loads the API.
--   `bin/rails db` opens your database client and loads the correct database.
--   `bin/rails server` starts the API.
--   `scripts/*.sh` run various `curl` commands to test the API. See below.
-
-<!-- TODO -   `rake nag` checks your code style. -->
-<!-- TODO -   `rake lint` checks your code for syntax errors. -->
-
-## API
-
-Use this as the basis for your own API documentation. Add a new third-level
-heading for your custom entities, and follow the pattern provided for the
-built-in user authentication documentation.
-
-Scripts are included in [`scripts`](scripts) to test built-in actions. Add your
-own scripts to test your custom API. As an alternative, you can write automated
-tests in RSpec to test your API.
-
-### Authentication
-
-| Verb   | URI Pattern            | Controller#Action |
-|--------|------------------------|-------------------|
-| POST   | `/sign-up`             | `users#signup`    |
-| POST   | `/sign-in`             | `users#signin`    |
-| PATCH  | `/change-password/:id` | `users#changepw`  |
-| DELETE | `/sign-out/:id`        | `users#signout`   |
-
-#### POST /sign-up
-
-Request:
-
-```sh
-curl http://localhost:4741/sign-up \
-  --include \
-  --request POST \
-  --header "Content-Type: application/json" \
-  --data '{
-    "credentials": {
-      "email": "'"${EMAIL}"'",
-      "password": "'"${PASSWORD}"'",
-      "password_confirmation": "'"${PASSWORD}"'"
-    }
-  }'
-```
-
-```sh
-EMAIL=ava@bob.com PASSWORD=hannah scripts/sign-up.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 201 Created
-Content-Type: application/json; charset=utf-8
-
-{
-  "user": {
-    "id": 1,
-    "email": "ava@bob.com"
-  }
-}
-```
-
-#### POST /sign-in
-
-Request:
-
-```sh
-curl http://localhost:4741/sign-in \
-  --include \
-  --request POST \
-  --header "Content-Type: application/json" \
-  --data '{
-    "credentials": {
-      "email": "'"${EMAIL}"'",
-      "password": "'"${PASSWORD}"'"
-    }
-  }'
-```
-
-```sh
-EMAIL=ava@bob.com PASSWORD=hannah scripts/sign-in.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "user": {
-    "id": 1,
-    "email": "ava@bob.com",
-    "token": "BAhJIiVlZDIwZTMzMzQzODg5NTBmYjZlNjRlZDZlNzYxYzU2ZAY6BkVG--7e7f77f974edcf5e4887b56918f34cd9fe293b9f"
-  }
-}
-```
-
-#### PATCH /change-password/:id
-
-Request:
-
-```sh
-curl --include --request PATCH "http://localhost:4741/change-password/$ID" \
-  --header "Authorization: Token token=$TOKEN" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "passwords": {
-      "old": "'"${OLDPW}"'",
-      "new": "'"${NEWPW}"'"
-    }
-  }'
-```
-
-```sh
-ID=1 OLDPW=hannah NEWPW=elle TOKEN=BAhJIiVlZDIwZTMzMzQzODg5NTBmYjZlNjRlZDZlNzYxYzU2ZAY6BkVG--7e7f77f974edcf5e4887b56918f34cd9fe293b9f scripts/change-password.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 204 No Content
-```
-
-#### DELETE /sign-out/:id
-
-Request:
-
-```sh
-curl http://localhost:4741/sign-out/$ID \
-  --include \
-  --request DELETE \
-  --header "Authorization: Token token=$TOKEN"
-```
-
-```sh
-ID=1 TOKEN=BAhJIiVlZDIwZTMzMzQzODg5NTBmYjZlNjRlZDZlNzYxYzU2ZAY6BkVG--7e7f77f974edcf5e4887b56918f34cd9fe293b9f scripts/sign-out.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 204 No Content
-```
-
-### Users
-
-| Verb | URI Pattern | Controller#Action |
-|------|-------------|-------------------|
-| GET  | `/users`    | `users#index`     |
-| GET  | `/users/1`  | `users#show`      |
-
-#### GET /users
-
-Request:
-
-```sh
-curl http://localhost:4741/users \
-  --include \
-  --request GET \
-  --header "Authorization: Token token=$TOKEN"
-```
-
-```sh
-TOKEN=BAhJIiVlZDIwZTMzMzQzODg5NTBmYjZlNjRlZDZlNzYxYzU2ZAY6BkVG--7e7f77f974edcf5e4887b56918f34cd9fe293b9f scripts/users.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "users": [
-    {
-      "id": 2,
-      "email": "bob@ava.com"
-    },
-    {
-      "id": 1,
-      "email": "ava@bob.com"
-    }
-  ]
-}
-```
-
-#### GET /users/:id
-
-Request:
-
-```sh
-curl --include --request GET http://localhost:4741/users/$ID \
-  --header "Authorization: Token token=$TOKEN"
-```
-
-```sh
-ID=2 TOKEN=BAhJIiVlZDIwZTMzMzQzODg5NTBmYjZlNjRlZDZlNzYxYzU2ZAY6BkVG--7e7f77f974edcf5e4887b56918f34cd9fe293b9f scripts/user.sh
-```
-
-Response:
-
-```md
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "user": {
-    "id": 2,
-    "email": "bob@ava.com"
-  }
-}
-```
-
-### Reset Database without dropping
-
-This is not a task developers should run often, but it is sometimes necessary.
-
-**locally**
-
-```sh
-bin/rake db:migrate VERSION=0
-bin/rake db:migrate db:seed db:examples
-```
-
-**heroku**
-
-```sh
-heroku run rake db:migrate VERSION=0
-heroku run rake db:migrate db:seed db:examples
-```
-
-## [License](LICENSE)
-
-1.  All content is licensed under a CC­BY­NC­SA 4.0 license.
-1.  All software code is licensed under GNU GPLv3. For commercial use or
-    alternative licensing, please contact legal@ga.co.
+[![Feast Logo](https://i.imgur.com/WYoH4Xf.png)](https://sadjorlolo.github.io/feast-client/)
+
+# Feast
+
+[Feast](https://sadjorlolo.github.io/feast-client/) is a full-stack web
+application created by me, Sarah Adjorlolo. Both the
+[front-end repository](https://github.com/sadjorlolo/feast-client) and the
+[back-end repository](https://github.com/sadjorlolo/feast-api) are pinned to my
+[personal](https://github.com/sadjorlolo)
+GitHub page.
+
+The application can be found here: https://sadjorlolo.github.io/feast-client/.
+
+The back-end is deployed here: https://secure-hamlet-26595.herokuapp.com/.
+
+## About the Application
+
+The purpose of this application is to allow a user to manage their personal
+events and the attendees of their events.
+
+When a user signs up, they have the typical authorizaton capabilities to sign
+in, change password, and sign out. For this application, the user can also
+create custom events, with date, time, location, and description attributes.
+
+Once the event has been successfully created, the event creator has full CRUD
+capabilities - they can view, update, and delete the event as they please.
+Additionally, the event creator can invite other users to their events. As long
+as the invited user exists within Feast and is not already listed as an attendee
+for this specific event, they can be added. While an event creator cannot
+delete an added attendee from an event, upon event deletion, all invitations to
+attendees are subsequently deleted.
+
+If a user has been invited to an event, they are able to see all received
+invitations, view a single event to which they have been invited, and reject the
+invitation. If a user rejects an invitation, they are removed from the list of
+current attendees on the event creator's event.
+
+## Development Process
+
+Development of Feast began with the back-end Rails API set-up. I needed three
+tables: Users, Events, and Invitees. Relationships were a bit tricky, as they
+were bi-directional many-to-many. A User could have many events as an
+event_creator, but a User could also have many events as an event_attendee,
+through the Invitee join table. This was accomplished by creating custom names
+for the User and for the Event, such as "event_creator", "event_attendee", and
+"attended_event." A User has_many attended_events and created_events, and an
+Event has_many event_attendees and has_one event_creator. The two tables are
+joined together through the Invitees table, which has one event_attendee and
+one attended_event.
+
+After creating the tables and the custom relationships between the three, I tested
+the relationships with curl scripts. This ensured records could be created,
+viewed, updated, and deleted by a user, given specific constraints. For problem
+solving, I would use curl scripts to identify where I was receiving errors and
+work backward through the routes, permitted parameters, controller actions, etc.
+I would add a fix, re-test in the curl scripts, and keep going until the script
+worked as anticipated.
+
+The front-end was created using the front-end framework Angular 2; and I used the
+Angular authorization template created by Brian Distefano to get started.
+
+I was able to set up each component, generating modules and services as needed
+for my Invittes and Events resources. Multiple console.logs were used in the
+development process to make sure I was both passing and receiving the
+expected data. When I encountered a problem, as I often did, I would comment
+out large sections of code step through the data flow process a piece at a time
+until I could find the section that was breaking. If I could fix that, I would
+repeat the process, slowly adding in commented-out code to test further steps in
+the process.
+
+## Technologies Used
+
+- Heroku for app deployment
+- Ruby on Rails
+- curl scripts for testing in Terminal
+- Github pages for deploying the front-end
+
+## Back-end API Endpoints
+
+| Verb   | URI Pattern            | Controller#Action   |
+|:-------|:-----------------------|:--------------------|
+| POST   | `/sign-up`             | `users#signup`      |
+| POST   | `/sign-in`             | `users#signin`      |
+| DELETE | `/sign-out/:id`        | `users#signout`     |
+| PATCH  | `/change-password/:id` | `users#changepw`    |
+| GET    | `/events`              | `events#index`      |
+| GET    | `/events/:id`          | `events#show`       |
+| POST   | `/events`              | `events#create`     |
+| PATCH  | `/events/:id`          | `events#update`     |
+| DELETE | `/events/:id`          | `events#destroy`    |
+| GET    | `/invitees`            | `invitees#index`    |
+| GET    | `/invitees/:id`        | `invitees#show`     |
+| POST   | `/invitees`            | `invitees#create`   |
+| DELETE | `/invitees/:id`        | `invitees#destroy`  |
+
+## Future Iterations
+
+1) Add functonality to let event creator delete attendees from event.
+2) Responsiveness.
+3) When users enter attendee name, use fuzzy match to query all users.
+
+## Entity Relationship Diagram
+
+![Feast ERD](https://i.imgur.com/JGCe900.jpg)
